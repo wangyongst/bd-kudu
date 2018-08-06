@@ -1,11 +1,12 @@
-package com.myweb.kafka.controller;
+package com.myweb.elasticsearch.controller;
 
-import com.myweb.kafka.dao.DepthPriceRawRepository;
-import com.myweb.kafka.dao.TradeHistoryRawRepository;
-import com.myweb.kafka.pojo.DepthPriceRaw;
-import com.myweb.kafka.pojo.TradeHistoryRaw;
+import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
+import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
+import com.myweb.pojo.DepthPriceRaw;
+import com.myweb.pojo.TradeHistoryRaw;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,10 +14,10 @@ import java.util.Iterator;
 
 @RestController
 public class QueryController {
-    //@Autowired
+    @Autowired
     private DepthPriceRawRepository depthPriceRawRepository;
 
-    //@Autowired
+    @Autowired
     private TradeHistoryRawRepository tradeHistoryRawRepository;
 
     @RequestMapping("/query/depth-price-raw")

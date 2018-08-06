@@ -1,8 +1,10 @@
-package com.myweb.kafka.pojo;
+package com.myweb.pojo;
+
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 
-//@Document(indexName = "data-lake", type = "depth-price-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
+@Document(indexName = "data-lake", type = "depth-price-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
 public class DepthPriceRaw implements Serializable {
     private String counterParty;
     private String symbol;
