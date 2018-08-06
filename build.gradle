@@ -61,6 +61,14 @@ dependencies {
     compile('org.apache.commons:commons-lang3')
 
     compile('org.springframework.kafka:spring-kafka')
+
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+
+    compile('org.springframework.data:spring-data-elasticsearch')
+
+    compile('com.fasterxml.jackson.core:jackson-databind')
+
+    compile('net.java.dev.jna:jna')
 }
 
 
