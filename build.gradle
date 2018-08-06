@@ -6,10 +6,6 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
 
-apply plugin: 'application'
-mainClassName = 'com.myweb.Start'
-
-
 repositories {
     maven {
         url "http://maven.aliyun.com/nexus/content/groups/public/"
@@ -20,23 +16,29 @@ repositories {
 
 buildscript {
     repositories {
+        maven {
+            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        }
         mavenLocal()
         mavenCentral()
     }
     dependencies {
         classpath 'io.spring.gradle:dependency-management-plugin:1.0.0.RELEASE'
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.5.12.RELEASE')
     }
 }
 
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
 
 dependencyManagement {
     imports {
-        mavenBom 'io.spring.platform:platform-bom:Brussels-SR7'
+        mavenBom 'io.spring.platform:platform-bom:Brussels-SR9'
     }
 }
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = "utf-8"
+
 
 dependencies {
 
@@ -74,5 +76,3 @@ dependencies {
 
     compile('net.java.dev.jna:jna')
 }
-
-

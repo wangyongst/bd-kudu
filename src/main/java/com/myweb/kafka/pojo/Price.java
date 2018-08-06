@@ -1,10 +1,8 @@
 package com.myweb.kafka.pojo;
 
-import org.springframework.data.elasticsearch.annotations.Document;
-
 import java.io.Serializable;
 
-@Document(indexName = "data-lake", type = "price", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
+//@Document(indexName = "data-lake", type = "price", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
 public class Price implements Serializable {
     private String price;
     private String quantity;
