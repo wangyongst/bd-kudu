@@ -62,9 +62,13 @@ dependencies {
 
     compile('org.springframework.kafka:spring-kafka')
 
-    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch'){
+        exclude module: "spring-boot-starter-logging"
+    }
 
-    compile('org.springframework.data:spring-data-elasticsearch')
+    compile('org.springframework.data:spring-data-elasticsearch'){
+        exclude module: "spring-boot-starter-logging"
+    }
 
     compile('com.fasterxml.jackson.core:jackson-databind')
 
