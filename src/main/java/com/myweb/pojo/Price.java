@@ -1,7 +1,5 @@
 package com.myweb.pojo;
 
-import org.springframework.data.elasticsearch.annotations.Document;
-
 import java.io.Serializable;
 
 public class Price implements Serializable {

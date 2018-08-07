@@ -1,10 +1,11 @@
 package com.myweb.pojo;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 
-@Document(indexName = "data-lake", type = "trade-history-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
+@Document(indexName = "trade-history-raw", type = "trade-history-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
 public class TradeHistoryRaw implements Serializable {
     private String counterParty;
     private String symbol;
@@ -13,6 +14,7 @@ public class TradeHistoryRaw implements Serializable {
     private String quantity;
     private String marketMaker;
     private String refId;
+    @Id
     private String timestamp;
 
     public String getSide() {

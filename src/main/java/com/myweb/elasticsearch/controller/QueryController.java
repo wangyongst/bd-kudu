@@ -2,44 +2,32 @@ package com.myweb.elasticsearch.controller;
 
 import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
 import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
-import com.myweb.pojo.DepthPriceRaw;
-import com.myweb.pojo.TradeHistoryRaw;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Iterator;
-
 @RestController
 public class QueryController {
-    @Qualifier("DepthPriceRawRepository")
+    @Autowired
     private DepthPriceRawRepository depthPriceRawRepository;
 
-    @Qualifier("TradeHistoryRawRepository")
+    @Autowired
     private TradeHistoryRawRepository tradeHistoryRawRepository;
 
     @RequestMapping("/query/depth-price-raw")
-    public void queryDepthPriceRaw() {
-        String queryString = "springboot";//搜索关键字
-        QueryStringQueryBuilder builder = new QueryStringQueryBuilder(queryString);
-        Iterable<DepthPriceRaw> searchResult = depthPriceRawRepository.search(builder);
-        Iterator<DepthPriceRaw> iterator = searchResult.iterator();
-        while (iterator.hasNext()) {
-            System.out.println(iterator.next());
-        }
+    public Object queryDepthPriceRaw() {
+        Sort sort = new Sort(Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(0, 10, sort);
+        return depthPriceRawRepository.findAll(pageable);
     }
 
     @RequestMapping("/query/trade-history-raw")
-    public void queryTradeHistoryRaw() {
-        String queryString = "springboot";//搜索关键字
-        QueryStringQueryBuilder builder = new QueryStringQueryBuilder(queryString);
-        Iterable<TradeHistoryRaw> searchResult = tradeHistoryRawRepository.search(builder);
-        Iterator<TradeHistoryRaw> iterator = searchResult.iterator();
-        while (iterator.hasNext()) {
-            System.out.println(iterator.next());
-        }
+    public Object queryTradeHistoryRaw() {
+        Sort sort = new Sort(Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(0, 10, sort);
+        return tradeHistoryRawRepository.findAll(pageable);
     }
 }

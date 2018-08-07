@@ -7,7 +7,6 @@ import com.myweb.pojo.DepthPriceRaw;
 import com.myweb.pojo.TradeHistoryRaw;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.io.IOException;
@@ -25,11 +24,7 @@ public class Listener {
         ObjectMapper mapper = new ObjectMapper();
         try {
             DepthPriceRaw depthPriceRaw = mapper.readValue(record.value().toString(), DepthPriceRaw.class);
-            System.out.println("___________________________________________");
-            System.out.println(record.value().toString());
-            System.out.println(depthPriceRaw.toString());
             depthPriceRawRepository.save(depthPriceRaw);
-            System.out.println("___________________________________________");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,12 +35,8 @@ public class Listener {
         ObjectMapper mapper = new ObjectMapper();
         try {
             TradeHistoryRaw tradeHistoryRaw = mapper.readValue(record.value().toString(), TradeHistoryRaw.class);
-            System.out.println("___________________________________________");
             System.out.println(record.value().toString());
-            System.out.println(tradeHistoryRaw.toString());
             tradeHistoryRawRepository.save(tradeHistoryRaw);
-            System.out.println("___________________________________________");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
