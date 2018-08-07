@@ -6,6 +6,7 @@ import com.myweb.pojo.DepthPriceRaw;
 import com.myweb.pojo.TradeHistoryRaw;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,10 +15,10 @@ import java.util.Iterator;
 
 @RestController
 public class QueryController {
-    @Autowired
+    @Qualifier("DepthPriceRawRepository")
     private DepthPriceRawRepository depthPriceRawRepository;
 
-    @Autowired
+    @Qualifier("TradeHistoryRawRepository")
     private TradeHistoryRawRepository tradeHistoryRawRepository;
 
     @RequestMapping("/query/depth-price-raw")

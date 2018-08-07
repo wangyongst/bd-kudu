@@ -3,28 +3,29 @@ package com.myweb.pojo;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Document(indexName = "data-lake", type = "depth-price-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
 public class DepthPriceRaw implements Serializable {
     private String counterParty;
     private String symbol;
     private String timestamp;
-    private Price bids;
-    private Price asks;
+    private List<Price> bids;
+    private List<Price>  asks;
 
-    public Price getBids() {
+    public List<Price> getBids() {
         return bids;
     }
 
-    public void setBids(Price bids) {
+    public void setBids(List<Price> bids) {
         this.bids = bids;
     }
 
-    public Price getAsks() {
+    public List<Price> getAsks() {
         return asks;
     }
 
-    public void setAsks(Price asks) {
+    public void setAsks(List<Price> asks) {
         this.asks = asks;
     }
 
