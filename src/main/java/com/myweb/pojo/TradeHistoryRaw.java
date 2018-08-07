@@ -12,7 +12,7 @@ public class TradeHistoryRaw implements Serializable {
     private String side;
     private String price;
     private String quantity;
-    private String marketMaker;
+    private Boolean marketMaker;
     private String refId;
     @Id
     private String timestamp;
@@ -41,11 +41,11 @@ public class TradeHistoryRaw implements Serializable {
         this.quantity = quantity;
     }
 
-    public String getMarketMaker() {
+    public Boolean getMarketMaker() {
         return marketMaker;
     }
 
-    public void setMarketMaker(String marketMaker) {
+    public void setMarketMaker(Boolean marketMaker) {
         this.marketMaker = marketMaker;
     }
 
