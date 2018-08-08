@@ -1,11 +1,11 @@
-package com.myweb.pojo;
+package com.myweb.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 
-@Document(indexName = "trade-history-raw", type = "trade-history-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
+@Document(indexName = "trade-history", type = "trade-history-raw")
 public class TradeHistoryRaw implements Serializable {
     private String counterParty;
     private String symbol;

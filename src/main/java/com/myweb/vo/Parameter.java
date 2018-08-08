@@ -4,7 +4,6 @@ import java.util.List;
 
 public class Parameter {
 
-    private String tableName;
     private List<String> counterparty;
     private List<String> symbol;
     private Number startTimestamp;
@@ -12,14 +11,6 @@ public class Parameter {
     private Number page;
     private Number pagesize;
     private String order;
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 
     public List<String> getCounterparty() {
         return counterparty;
@@ -77,3 +68,7 @@ public class Parameter {
         this.order = order;
     }
 }
+
+
+
+

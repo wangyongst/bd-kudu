@@ -1,17 +1,20 @@
-package com.myweb.pojo;
+package com.myweb.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Document(indexName = "depth-price-raw", type = "depth-price-raw", indexStoreType = "fs", shards = 5, replicas = 1, refreshInterval = "-1")
+@Document(indexName = "depth-price", type = "depth-price-raw")
 public class DepthPriceRaw implements Serializable {
-
+    @Field(index = false)
     private String counterParty;
+    @Field(index = false)
     private String symbol;
     @Id
+    @Field(index = false)
     private Number timestamp;
     private List<Price> bids;
     private List<Price> asks;

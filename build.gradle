@@ -25,6 +25,7 @@ buildscript {
     dependencies {
         classpath 'io.spring.gradle:dependency-management-plugin:1.0.0.RELEASE'
         classpath('org.springframework.boot:spring-boot-gradle-plugin:2.0.4.RELEASE')
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.4'
     }
 }
 
@@ -41,7 +42,6 @@ dependencyManagement {
 
 
 dependencies {
-
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-logging"
     }
@@ -58,10 +58,6 @@ dependencies {
     compile('org.apache.commons:commons-lang3')
 
     compile('org.springframework.kafka:spring-kafka')
-
-    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch'){
-        exclude module: "spring-boot-starter-logging"
-    }
 
     compile('org.springframework.data:spring-data-elasticsearch'){
         exclude module: "spring-boot-starter-logging"
