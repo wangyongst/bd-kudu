@@ -9,12 +9,9 @@ import java.util.List;
 
 @Document(indexName = "depth-price", type = "depth-price-raw")
 public class DepthPriceRaw implements Serializable {
-    @Field(index = false)
     private String counterParty;
-    @Field(index = false)
     private String symbol;
     @Id
-    @Field(index = false)
     private Number timestamp;
     private List<Price> bids;
     private List<Price> asks;
