@@ -66,4 +66,6 @@ dependencies {
     compile('com.fasterxml.jackson.core:jackson-databind')
 
     compile('com.amazonaws:aws-java-sdk:1.9.2')
+
+    compile('com.anoyi:spring-boot-starter-grpc:1.5.14.RELEASE')
 }
