@@ -3,13 +3,16 @@ package com.myweb.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Document(indexName = "depth-price", type = "depth-price-raw")
 public class DepthPriceRaw implements Serializable {
+    @Field(store=true,type= FieldType.Keyword)
     private String counterParty;
+    @Field(store=true,type= FieldType.Keyword)
     private String symbol;
     @Id
     private Number timestamp;

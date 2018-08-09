@@ -52,38 +52,6 @@ public class OneServiceImpl implements OneService {
         return "";
     }
 
-
-    @Override
-    public Object queryDepthPriceRaw2(Parameter parameter) {
-        Result result = new Result();
-        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) {
-            result.setStatus(2001);
-            result.setMessage("Both of startTimestamp and endTimestamp can not be empty");
-            return result;
-        }
-        if (parameter.getPage() == null) parameter.setPage(0);
-        if (parameter.getPagesize() == null || parameter.getPagesize().intValue() == 0) parameter.setPagesize(10);
-        Sort sort = null;
-        if (StringUtils.isNotBlank(parameter.getOrder()) && parameter.getOrder().equals("desc")) {
-            sort = new Sort(Sort.Direction.DESC, "timestamp");
-        } else if (StringUtils.isBlank(parameter.getOrder()) || parameter.getOrder().equals("asc")) {
-            sort = new Sort(Sort.Direction.ASC, "timestamp");
-        }
-        Pageable pageable = PageRequest.of(parameter.getPage().intValue(), parameter.getPagesize().intValue(), sort);
-        if (parameter.getCounterparty() == null && parameter.getSymbol() == null) {
-            return depthPriceRawRepository.findByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterparty() == null && parameter.getSymbol() != null) {
-            return depthPriceRawRepository.findBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterparty() != null && parameter.getSymbol() == null) {
-            return depthPriceRawRepository.findByCounterPartyInAndTimestampBetween(parameter.getCounterparty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterparty() != null && parameter.getSymbol() != null) {
-            return depthPriceRawRepository.findByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterparty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        }
-        return "";
-    }
-
-
-
     public Object queryTradeHistoryRaw(Parameter parameter) {
         Result result = new Result();
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) {

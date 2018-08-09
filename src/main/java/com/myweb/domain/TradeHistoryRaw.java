@@ -2,12 +2,16 @@ package com.myweb.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.Serializable;
 
 @Document(indexName = "trade-history", type = "trade-history-raw")
 public class TradeHistoryRaw implements Serializable {
+    @Field(store=true,type= FieldType.Keyword)
     private String counterParty;
+    @Field(store=true,type= FieldType.Keyword)
     private String symbol;
     private String side;
     private String price;

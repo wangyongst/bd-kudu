@@ -24,7 +24,6 @@ public class Listener {
         ObjectMapper mapper = new ObjectMapper();
         try {
             System.out.println("---------------------------------------------------");
-            System.out.println(record.key());
             System.out.println(record.value().toString());
             System.out.println("---------------------------------------------------");
             DepthPriceRaw depthPriceRaw = mapper.readValue(record.value().toString(), DepthPriceRaw.class);
@@ -39,11 +38,9 @@ public class Listener {
         ObjectMapper mapper = new ObjectMapper();
         try {
             System.out.println("---------------------------------------------------");
-            System.out.println(record.key());
             System.out.println(record.value().toString());
             System.out.println("---------------------------------------------------");
             TradeHistoryRaw tradeHistoryRaw = mapper.readValue(record.value().toString(), TradeHistoryRaw.class);
-            System.out.println(record.value().toString());
             tradeHistoryRawRepository.save(tradeHistoryRaw);
         } catch (IOException e) {
             e.printStackTrace();

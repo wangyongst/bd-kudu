@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AmazonS3Utils {
-    @Value("${amazons3.accesskey}")
+   // @Value("${amazons3.accesskey}")
     private String accesskeyid;
-    @Value("${amazons3.secretaccesskey}")
+ //   @Value("${amazons3.secretaccesskey}")
     private String secretaccesskey;
 
     private AmazonS3 s3client;
