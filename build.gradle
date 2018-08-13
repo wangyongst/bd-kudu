@@ -68,4 +68,6 @@ dependencies {
     compile('com.amazonaws:aws-java-sdk:1.9.2')
 
     compile('com.anoyi:spring-boot-starter-grpc:1.5.14.RELEASE')
+
+    compile group: 'org.apache.avro', name: 'avro-tools', version: '1.8.2'
 }
