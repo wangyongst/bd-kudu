@@ -10,11 +10,11 @@ public interface OneService {
 
     public Object queryTradeHistoryRaw(Parameter parameter);
 
-    public void transDepthPriceRaw(Parameter parameter);
+    public boolean transDepthPriceRaw(Parameter parameter);
 
-    public void transTradeHistoryRaw(Parameter parameter);
+    public boolean transTradeHistoryRaw(Parameter parameter);
 
-    public void restoreDepthPriceRaw(Parameter parameter);
+    public boolean restoreDepthPriceRaw(Parameter parameter);
 
-    public void restoreTradeHistoryRaw(Parameter parameter);
+    public boolean restoreTradeHistoryRaw(Parameter parameter);
 }

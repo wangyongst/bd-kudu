@@ -1,7 +1,5 @@
 package com.myweb.elasticsearch.service.impl;
 
-import com.myweb.vo.Parameter;
-import com.myweb.vo.Result;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
@@ -17,51 +15,62 @@ import java.io.Serializable;
 
 public class ServiceUtils {
 
-    public static Result checkParameter(Parameter parameter) {
-        Result result = new Result();
-        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) {
-            result.setStatus(2001);
-            result.setMessage("Both of startTimestamp and endTimestamp can not be empty");
-        }
-        return result;
-    }
-
-
-    public static DataFileWriter<? extends Serializable> getDataFileWriter(Class<? extends Serializable> theClass, String fileName) throws IOException {
+    public static DataFileWriter<? extends Serializable> getDataFileWriter(Class<? extends Serializable> theClass, String fileName) {
         File file = new File(fileName);
         Schema schema = ReflectData.get().getSchema(theClass);
         DatumWriter<Serializable> datumWriter = new ReflectDatumWriter<Serializable>((Class<Serializable>) theClass);
-        DataFileWriter<Serializable> out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
-
+        DataFileWriter<Serializable> out = null;
+        try {
+            out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return out;
     }
 
     public static void closeWriter(
-            DataFileWriter<? extends Serializable> dataFileWriter)
-            throws IOException {
+            DataFileWriter<? extends Serializable> dataFileWriter) {
         if (dataFileWriter != null) {
-            dataFileWriter.flush();
-            dataFileWriter.close();
+            try {
+                dataFileWriter.flush();
+                dataFileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
-    public static void writeToAvro(DataFileWriter dataFileWriter, Object object, Class<? extends Serializable> theClass) throws IOException {
+    public static void writeToAvro(DataFileWriter dataFileWriter, Object object, Class<? extends Serializable> theClass) {
         synchronized (dataFileWriter) {
-            dataFileWriter.append(theClass.cast(object));
-            dataFileWriter.flush();
+            try {
+                dataFileWriter.append(theClass.cast(object));
+                dataFileWriter.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public static DataFileReader<? extends Serializable> getDataFileReader(String fileName, Class<? extends Serializable> theClass) throws IOException {
+    public static DataFileReader<? extends Serializable> getDataFileReader(String fileName, Class<? extends Serializable> theClass) {
         DatumReader<Serializable> userDatumReader = new ReflectDatumReader<Serializable>((Class<Serializable>) theClass);
-        DataFileReader<Serializable> dataFileReader = new DataFileReader<Serializable>(new File(fileName), userDatumReader);
+        DataFileReader<Serializable> dataFileReader = null;
+        try {
+            dataFileReader = new DataFileReader<Serializable>(new File(fileName), userDatumReader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return dataFileReader;
     }
 
     public static void closeDataFileReader(
-            DataFileReader<? extends Serializable> dataFileReader) throws IOException {
+            DataFileReader<? extends Serializable> dataFileReader) {
         if (dataFileReader != null) {
-            dataFileReader.close();
+            try {
+                dataFileReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

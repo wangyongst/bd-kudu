@@ -22,7 +22,7 @@ public class TimerTask {
         Parameter parameter = new Parameter();
         parameter.setStartTimestamp(new Date().getTime() - 1000 * 60 * 60);
         parameter.setEndTimestamp(new Date().getTime());
-        oneService.transTradeHistoryRaw(parameter);
-        oneService.transDepthPriceRaw(parameter);
+        while (!oneService.transTradeHistoryRaw(parameter)) ;
+        while (!oneService.transDepthPriceRaw(parameter)) ;
     }
 }
