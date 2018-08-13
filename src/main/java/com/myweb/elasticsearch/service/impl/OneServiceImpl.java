@@ -75,4 +75,30 @@ public class OneServiceImpl implements OneService {
         }
         return result;
     }
+
+    @Override
+    public void transDepthPriceRaw(Parameter parameter) {
+
+        //file avro
+
+        //delete
+
+    }
+
+    @Override
+    public void transTradeHistoryRaw(Parameter parameter) {
+        //file avro
+
+        //delete
+    }
+
+    @Override
+    public void restoreDepthPriceRaw(Parameter parameter) {
+        //restore
+    }
+
+    @Override
+    public void restoreTradeHistoryRaw(Parameter parameter) {
+        //restore
+    }
 }
