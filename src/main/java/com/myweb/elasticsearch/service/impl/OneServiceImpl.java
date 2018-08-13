@@ -1,14 +1,17 @@
 package com.myweb.elasticsearch.service.impl;
 
 
+import com.myweb.domain.DepthPriceRaw;
+import com.myweb.domain.TradeHistoryRaw;
 import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
 import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
 import com.myweb.elasticsearch.service.OneService;
 import com.myweb.vo.Parameter;
-import com.myweb.vo.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service("OneService")
 @SuppressWarnings("All")
@@ -21,9 +24,8 @@ public class OneServiceImpl implements OneService {
     private TradeHistoryRawRepository tradeHistoryRawRepository;
 
     @Override
-    public Object queryDepthPriceRaw(Parameter parameter) {
-        Result result = ServiceUtils.checkParameter(parameter);
-        if (result.getStatus() != 0) return result;
+    public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
         if (StringUtils.isNotBlank(parameter.getOrder()) && parameter.getOrder().equals("asc")) {
             if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
                 return depthPriceRawRepository.findByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
@@ -45,13 +47,12 @@ public class OneServiceImpl implements OneService {
                 return depthPriceRawRepository.findByCounterPartyInAndSymbolInAndTimestampBetweenOrderByTimestampDesc(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
             }
         }
-        return result;
+        return null;
     }
 
     @Override
-    public Object queryTradeHistoryRaw(Parameter parameter) {
-        Result result = ServiceUtils.checkParameter(parameter);
-        if (result.getStatus() != 0) return result;
+    public List<TradeHistoryRaw> queryTradeHistoryRaw(Parameter parameter) {
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
         if (StringUtils.isNotBlank(parameter.getOrder()) && parameter.getOrder().equals("asc")) {
             if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
                 return tradeHistoryRawRepository.findByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
@@ -73,23 +74,25 @@ public class OneServiceImpl implements OneService {
                 return tradeHistoryRawRepository.findByCounterPartyInAndSymbolInAndTimestampBetweenOrderByTimestampDesc(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
             }
         }
-        return result;
+        return null;
     }
 
     @Override
     public void transDepthPriceRaw(Parameter parameter) {
-
+        List<DepthPriceRaw> depthPriceRaws = queryDepthPriceRaw(parameter);
         //file avro
 
         //delete
-
+        depthPriceRawRepository.deleteAll(depthPriceRaws);
     }
 
     @Override
     public void transTradeHistoryRaw(Parameter parameter) {
+        List<TradeHistoryRaw> tradeHistoryRaws = queryTradeHistoryRaw(parameter);
         //file avro
 
         //delete
+        tradeHistoryRawRepository.deleteAll(tradeHistoryRaws);
     }
 
     @Override
