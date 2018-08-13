@@ -97,11 +97,19 @@ public class OneServiceImpl implements OneService {
 
     @Override
     public void restoreDepthPriceRaw(Parameter parameter) {
-        //restore
+        List<DepthPriceRaw> depthPriceRaws = queryDepthPriceRaw(parameter);
+        //file avro
+
+        //delete
+        depthPriceRawRepository.deleteAll(depthPriceRaws);
     }
 
     @Override
     public void restoreTradeHistoryRaw(Parameter parameter) {
-        //restore
+        List<TradeHistoryRaw> tradeHistoryRaws = queryTradeHistoryRaw(parameter);
+        //file avro
+
+        //delete
+        tradeHistoryRawRepository.deleteAll(tradeHistoryRaws);
     }
 }
