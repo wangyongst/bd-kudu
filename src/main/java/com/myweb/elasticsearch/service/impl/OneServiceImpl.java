@@ -48,6 +48,7 @@ public class OneServiceImpl implements OneService {
         return result;
     }
 
+    @Override
     public Object queryTradeHistoryRaw(Parameter parameter) {
         Result result = ServiceUtils.checkParameter(parameter);
         if (result.getStatus() != 0) return result;
