@@ -15,6 +15,7 @@ public class DepthPriceRaw implements Serializable {
     @Field(store=true,type= FieldType.Keyword)
     private String symbol;
     @Id
+    @Field(store=true,type= FieldType.Long)
     private Number timestamp;
     private List<Price> bids;
     private List<Price> asks;

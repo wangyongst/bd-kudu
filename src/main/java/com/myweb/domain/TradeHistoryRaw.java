@@ -19,7 +19,8 @@ public class TradeHistoryRaw implements Serializable {
     private Boolean marketMaker;
     private String refId;
     @Id
-    private String timestamp;
+    @Field(store=true,type= FieldType.Long)
+    private Number timestamp;
 
     public String getSide() {
         return side;
@@ -77,11 +78,11 @@ public class TradeHistoryRaw implements Serializable {
         this.symbol = symbol;
     }
 
-    public String getTimestamp() {
+    public Number getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Number timestamp) {
         this.timestamp = timestamp;
     }
 }

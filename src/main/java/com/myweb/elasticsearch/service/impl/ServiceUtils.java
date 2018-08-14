@@ -1,5 +1,6 @@
 package com.myweb.elasticsearch.service.impl;
 
+import com.myweb.vo.Parameter;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
@@ -12,6 +13,8 @@ import org.apache.avro.reflect.ReflectDatumWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServiceUtils {
 
@@ -72,5 +75,34 @@ public class ServiceUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String makePath(String path, Parameter parameter) {
+        String subpath = String.valueOf((int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60 * 24)));
+        File file = new File(path + File.separator + subpath);
+        if (!file.exists()) file.mkdir();
+        return file.getAbsolutePath();
+    }
+
+    public static List<File> getFile(String path, Parameter parameter) {
+        Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60 * 24));
+        Integer end = (int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60 * 24));
+        List<File> files = new ArrayList<>();
+        for (int i = 0; start + i <= end; i++) {
+            File file = new File(path + File.separator + String.valueOf(start + i));
+            if (file.exists() && file.isDirectory()) {
+                for (File f : file.listFiles()) {
+                    String name = f.getName();
+                    if (Long.parseLong(name.split("-")[1]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(name.split("-")[2]) >= (Long) parameter.getStartTimestamp()) {
+                        files.add(f);
+                    } else if (Long.parseLong(name.split("-")[2]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split("-")[1]) <= (Long) parameter.getEndTimestamp()) {
+                        files.add(f);
+                    } else if (Long.parseLong(name.split("-")[2]) <= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split("-")[1]) >= (Long) parameter.getStartTimestamp()) {
+                        files.add(f);
+                    }
+                }
+            }
+        }
+        return files;
     }
 }
