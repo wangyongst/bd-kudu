@@ -35,11 +35,11 @@
 
         <Logger name="org.apache.kafka" level="ERROR"></Logger>
         <Logger name="org.springframework.kafka" level="ERROR"></Logger>
-        <Logger name="org.elasticsearch" level="debug"></Logger>
-        <Logger name="io.netty.util.internal" level="trace"></Logger>
+        <Logger name="org.elasticsearch" level="ERROR"></Logger>
+        <Logger name="io.netty.util.internal" level="DEBUG"></Logger>
 
         <!--         建立一个默认的root的logger -->
-        <root level="debug">
+        <root level="INFO">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
             <appender-ref ref="ERROR"/>
