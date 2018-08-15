@@ -18,7 +18,7 @@ public interface OneService {
 
     public boolean transTradeHistoryRaw(Parameter parameter);
 
-    public boolean restoreDepthPriceRaw(Parameter parameter);
+    public List<DepthPriceRaw> searchDepthPriceRaw(Parameter parameter);
 
-    public boolean restoreTradeHistoryRaw(Parameter parameter);
+    public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter);
 }

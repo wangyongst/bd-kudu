@@ -3,22 +3,22 @@ package com.myweb.domain;
 import java.io.Serializable;
 
 public class Price implements Serializable {
-    private Number price;
-    private Number quantity;
+    private Double price;
+    private Double quantity;
 
-    public Number getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Number price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public Number getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Number quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 }
