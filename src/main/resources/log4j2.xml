@@ -42,7 +42,7 @@
         <root level="error">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
-            <appender-ref ref="error"/>
+            <appender-ref ref="ERROR"/>
             <appender-ref ref="log"/>
         </root>
 
