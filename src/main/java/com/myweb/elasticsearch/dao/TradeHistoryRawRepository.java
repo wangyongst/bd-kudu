@@ -14,4 +14,5 @@ public interface TradeHistoryRawRepository extends ElasticsearchRepository<Trade
 
     public List<TradeHistoryRaw> findByCounterPartyInAndSymbolInAndTimestampBetween(List<String> counterPartys, List<String> symbols, long startTimestamp, long endTimestamp);
 
+    public void deleteAllByTimestampBetween(long startTimestamp, long endTimestamp);
 }

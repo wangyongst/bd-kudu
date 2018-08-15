@@ -16,4 +16,6 @@ public interface DepthPriceRawRepository extends ElasticsearchRepository<DepthPr
 
     public List<DepthPriceRaw> findByCounterPartyInAndSymbolInAndTimestampBetween(List<String> counterPartys, List<String> symbols, long startTimestamp, long endTimestamp);
 
+    public void deleteAllByTimestampBetween(long startTimestamp, long endTimestamp);
+
 }

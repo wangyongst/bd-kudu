@@ -115,7 +115,7 @@ public class OneServiceImpl implements OneService {
         });
         ServiceUtils.closeWriter(dataFileWriter);
         //delete
-        depthPriceRawRepository.deleteAll(depthPriceRawRepository.findByTimestampBetween(0L, parameter.getEndTimestamp()));
+        depthPriceRawRepository.deleteAllByTimestampBetween(0L, parameter.getEndTimestamp());
         return true;
     }
 
@@ -130,7 +130,7 @@ public class OneServiceImpl implements OneService {
         });
         ServiceUtils.closeWriter(dataFileWriter);
         //delete
-        tradeHistoryRawRepository.deleteAll(tradeHistoryRawRepository.findByTimestampBetween(0L, parameter.getEndTimestamp()));
+        tradeHistoryRawRepository.deleteAllByTimestampBetween(0L, parameter.getEndTimestamp());
         return true;
     }
 
