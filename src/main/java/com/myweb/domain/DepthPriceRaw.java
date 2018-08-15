@@ -16,7 +16,7 @@ public class DepthPriceRaw implements Serializable {
     private String symbol;
     @Id
     @Field(store=true,type= FieldType.Long)
-    private Number timestamp;
+    private Long timestamp;
     private List<Price> bids;
     private List<Price> asks;
 
@@ -52,11 +52,11 @@ public class DepthPriceRaw implements Serializable {
         this.symbol = symbol;
     }
 
-    public Number getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Number timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 }

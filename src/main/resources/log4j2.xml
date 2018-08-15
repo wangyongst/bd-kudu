@@ -33,16 +33,16 @@
     <!--     然后定义logger，只有定义了logger并引入的appender，appender才会生效 -->
     <loggers>
 
-        <Logger name="org.apache.kafka" level="ERROR"></Logger>
-        <Logger name="org.springframework.kafka" level="ERROR"></Logger>
-        <Logger name="org.elasticsearch" level="ERROR"></Logger>
-        <Logger name="io.netty.util.internal" level="DEBUG"></Logger>
+        <Logger name="org.apache.kafka" level="error"></Logger>
+        <Logger name="org.springframework.kafka" level="error"></Logger>
+        <Logger name="org.elasticsearch" level="error"></Logger>
+        <Logger name="io.netty.util.internal" level="error"></Logger>
 
         <!--         建立一个默认的root的logger -->
-        <root level="INFO">
+        <root level="error">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
-            <appender-ref ref="ERROR"/>
+            <appender-ref ref="error"/>
             <appender-ref ref="log"/>
         </root>
 

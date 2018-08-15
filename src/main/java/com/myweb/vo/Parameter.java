@@ -6,8 +6,8 @@ public class Parameter {
 
     private List<String> counterParty;
     private List<String> symbol;
-    private Number startTimestamp;
-    private Number endTimestamp;
+    private Long startTimestamp;
+    private Long endTimestamp;
     private String order;
 
     public List<String> getCounterParty() {
@@ -26,19 +26,19 @@ public class Parameter {
         this.symbol = symbol;
     }
 
-    public Number getStartTimestamp() {
+    public Long getStartTimestamp() {
         return startTimestamp;
     }
 
-    public void setStartTimestamp(Number startTimestamp) {
+    public void setStartTimestamp(Long startTimestamp) {
         this.startTimestamp = startTimestamp;
     }
 
-    public Number getEndTimestamp() {
+    public Long getEndTimestamp() {
         return endTimestamp;
     }
 
-    public void setEndTimestamp(Number endTimestamp) {
+    public void setEndTimestamp(Long endTimestamp) {
         this.endTimestamp = endTimestamp;
     }
 

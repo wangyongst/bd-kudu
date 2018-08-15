@@ -20,7 +20,7 @@ public class TradeHistoryRaw implements Serializable {
     private String refId;
     @Id
     @Field(store=true,type= FieldType.Long)
-    private Number timestamp;
+    private Long timestamp;
 
     public String getSide() {
         return side;
@@ -78,11 +78,11 @@ public class TradeHistoryRaw implements Serializable {
         this.symbol = symbol;
     }
 
-    public Number getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Number timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 }

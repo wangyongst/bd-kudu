@@ -95,7 +95,7 @@ public class OneServiceImpl implements OneService {
     public boolean transDepthPriceRaw(Parameter parameter) {
         List<DepthPriceRaw> depthPriceRaws = depthPriceRawRepository.findByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         //file avro
-        if(depthPriceRaws.size() == 0) return true;
+        if (depthPriceRaws.size() == 0) return true;
         DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + "dpr-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
         depthPriceRaws.forEach(e -> {
             ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
@@ -114,7 +114,7 @@ public class OneServiceImpl implements OneService {
     public boolean transTradeHistoryRaw(Parameter parameter) {
         List<TradeHistoryRaw> tradeHistoryRaws = tradeHistoryRawRepository.findByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         //file avro
-        if(tradeHistoryRaws.size() == 0) return true;
+        if (tradeHistoryRaws.size() == 0) return true;
         DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + "thr-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
         tradeHistoryRaws.forEach(e -> {
             ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
@@ -134,7 +134,7 @@ public class OneServiceImpl implements OneService {
         List<File> files = ServiceUtils.getFile(depthpricerawpath, parameter);
         files.forEach(e -> {
             DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), DepthPriceRaw.class);
-            DepthPriceRaw depthPriceRaw = null;
+            DepthPriceRaw depthPriceRaw = new DepthPriceRaw();
             while (dataFileReader.hasNext()) {
                 try {
                     depthPriceRaw = dataFileReader.next(depthPriceRaw);
@@ -168,5 +168,21 @@ public class OneServiceImpl implements OneService {
             tradeHistoryRawRepository.saveAll(tradeHistoryRaws);
         });
         return true;
+    }
+
+
+    public static void main(String[] args) {
+        File file = new File("D:\\cvro\\17757\\dpr-1534284000000-1534287600000");
+        DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) ServiceUtils.getDataFileReader(file.getAbsolutePath(), DepthPriceRaw.class);
+        DepthPriceRaw depthPriceRaw = new DepthPriceRaw();
+        while (dataFileReader.hasNext()) {
+            try {
+                depthPriceRaw = dataFileReader.next(depthPriceRaw);
+                System.out.println(depthPriceRaw.toString());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        ServiceUtils.closeDataFileReader(dataFileReader);
     }
 }

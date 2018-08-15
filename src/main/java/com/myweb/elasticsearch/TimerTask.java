@@ -17,6 +17,7 @@ public class TimerTask {
     private OneService oneService;
 
     @Scheduled(cron = "0 0 0/1 * * ?") // 每1小时秒执行一次
+//    @Scheduled(cron = "0/30 * * * * ?") // 每1小时秒执行一次
     public void scheduler() {
         Parameter parameter = new Parameter();
         parameter.setStartTimestamp(new Date().getTime() - 1000 * 60 * 60 * 2);
