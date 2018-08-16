@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ServiceUtils {
@@ -86,7 +87,8 @@ public class ServiceUtils {
 
     public static List<File> getFile(String path, Parameter parameter) {
         Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60 * 24));
-        Integer end = (int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60 * 24));
+        if (start <= 17757) start = 17757;
+        Integer end = (int) ((Long) new Date().getTime() / (1000 * 60 * 60 * 24));
         List<File> files = new ArrayList<>();
         for (int i = 0; start + i <= end; i++) {
             File file = new File(path + File.separator + String.valueOf(start + i));
