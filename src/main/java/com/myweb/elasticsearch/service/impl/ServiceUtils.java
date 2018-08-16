@@ -88,7 +88,9 @@ public class ServiceUtils {
     public static List<File> getFile(String path, Parameter parameter) {
         Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60));
         if (start <= 426223) start = 426223;
-        Integer end = (int) ((Long) new Date().getTime() / (1000 * 60 * 60));
+        Integer now = (int) ((Long) new Date().getTime() / (1000 * 60 * 60));
+        Integer end = (int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60));
+        if (end >= now) end = now;
         List<File> files = new ArrayList<>();
         for (int i = 0; start + i <= end; i++) {
             File file = new File(path + File.separator + String.valueOf(start + i));
