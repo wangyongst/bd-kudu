@@ -11,6 +11,8 @@ import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -36,18 +38,21 @@ public class OneServiceImpl implements OneService {
     @Value("${custom.avro.path.tradehistoryraw}")
     private String tradehistoryrawpath;
 
+    private Pageable pageable = PageRequest.of(0, 10000);
+
     @Override
     public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
+
         List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRaws;
         if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
-            depthPriceRaws = depthPriceRawRepository.findByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            depthPriceRaws = depthPriceRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
         } else if (parameter.getCounterParty() == null && parameter.getSymbol() != null) {
-            depthPriceRaws = depthPriceRawRepository.findBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            depthPriceRaws = depthPriceRawRepository.findAllBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
         } else if (parameter.getCounterParty() != null && parameter.getSymbol() == null) {
-            depthPriceRaws = depthPriceRawRepository.findByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            depthPriceRaws = depthPriceRawRepository.findAllByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
         } else if (parameter.getCounterParty() != null && parameter.getSymbol() != null) {
-            depthPriceRaws = depthPriceRawRepository.findByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            depthPriceRaws = depthPriceRawRepository.findAllByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
         }
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
         depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
@@ -75,13 +80,13 @@ public class OneServiceImpl implements OneService {
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
         List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
         if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            tradeHistoryRaws = tradeHistoryRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         } else if (parameter.getCounterParty() == null && parameter.getSymbol() != null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            tradeHistoryRaws = tradeHistoryRawRepository.findAllBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         } else if (parameter.getCounterParty() != null && parameter.getSymbol() == null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            tradeHistoryRaws = tradeHistoryRawRepository.findAllByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         } else if (parameter.getCounterParty() != null && parameter.getSymbol() != null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+            tradeHistoryRaws = tradeHistoryRawRepository.findAllByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         }
         List<TradeHistoryRaw> tradeHistoryRawList = new ArrayList<TradeHistoryRaw>();
         tradeHistoryRawList.addAll(searchTradeHistoryRaw(parameter));
@@ -106,7 +111,7 @@ public class OneServiceImpl implements OneService {
 
     @Override
     public boolean transDepthPriceRaw(Parameter parameter) {
-        List<DepthPriceRaw> depthPriceRaws = depthPriceRawRepository.findByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+        List<DepthPriceRaw> depthPriceRaws = depthPriceRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + "dpr-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
@@ -121,7 +126,7 @@ public class OneServiceImpl implements OneService {
 
     @Override
     public boolean transTradeHistoryRaw(Parameter parameter) {
-        List<TradeHistoryRaw> tradeHistoryRaws = tradeHistoryRawRepository.findByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
+        List<TradeHistoryRaw> tradeHistoryRaws = tradeHistoryRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue());
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + "thr-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
