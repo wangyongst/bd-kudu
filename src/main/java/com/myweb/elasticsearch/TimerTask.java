@@ -16,12 +16,11 @@ public class TimerTask {
     @Autowired
     private OneService oneService;
 
-    @Scheduled(cron = "0 0/30 * * * ?") // 每半小时秒执行一次
-//    @Scheduled(cron = "0/30 * * * * ?") // 每30秒执行一次
+    @Scheduled(cron = "0/30 * * * * ?") // 每30秒执行一次
     public void scheduler() {
         Parameter parameter = new Parameter();
-        parameter.setStartTimestamp(new Date().getTime() - 1000 * 60 * 60);
-        parameter.setEndTimestamp(new Date().getTime() - 1000 * 60 * 30);
+        parameter.setStartTimestamp(new Date().getTime() - 1000 * 60);
+        parameter.setEndTimestamp(new Date().getTime() - 1000 * 30);
         while (!oneService.transTradeHistoryRaw(parameter)) ;
         while (!oneService.transDepthPriceRaw(parameter)) ;
     }

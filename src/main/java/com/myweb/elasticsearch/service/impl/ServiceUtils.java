@@ -79,16 +79,15 @@ public class ServiceUtils {
     }
 
     public static String makePath(String path, Parameter parameter) {
-        String subpath = String.valueOf((int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60 * 24)));
+        String subpath = String.valueOf((int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60)));
         File file = new File(path + File.separator + subpath);
         if (!file.exists()) file.mkdir();
         return file.getAbsolutePath();
     }
 
     public static List<File> getFile(String path, Parameter parameter) {
-        Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60 * 24));
-        if (start <= 17757) start = 17757;
-        Integer end = (int) ((Long) new Date().getTime() / (1000 * 60 * 60 * 24));
+        Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60));
+        Integer end = (int) ((Long) new Date().getTime() / (1000 * 60 * 60));
         List<File> files = new ArrayList<>();
         for (int i = 0; start + i <= end; i++) {
             File file = new File(path + File.separator + String.valueOf(start + i));
