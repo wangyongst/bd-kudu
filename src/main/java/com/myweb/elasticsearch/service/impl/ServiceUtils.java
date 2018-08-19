@@ -2,6 +2,7 @@ package com.myweb.elasticsearch.service.impl;
 
 import com.myweb.vo.Parameter;
 import org.apache.avro.Schema;
+import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumReader;
@@ -25,10 +26,13 @@ public class ServiceUtils {
         DatumWriter<Serializable> datumWriter = new ReflectDatumWriter<Serializable>((Class<Serializable>) theClass);
         DataFileWriter<Serializable> out = null;
         try {
-            out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
+            if (!file.exists()) {
+                out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
+            } else out = new DataFileWriter<Serializable>(datumWriter).appendTo(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
+//        out.setCodec(CodecFactory.snappyCodec());
         return out;
     }
 
