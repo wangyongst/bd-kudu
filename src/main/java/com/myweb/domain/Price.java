@@ -1,24 +1,25 @@
 package com.myweb.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Price implements Serializable {
-    private Double price;
-    private Double quantity;
+    private BigDecimal price;
+    private BigDecimal quantity;
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public Double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 }

@@ -33,7 +33,7 @@ public class GrpcClient {
     }
 
     public static void main(String[] args) throws Exception {
-        GrpcClient client = new GrpcClient("13.250.35.50", 9528);
+        GrpcClient client = new GrpcClient("127.0.0.1", 9528);
 //        GrpcClient client = new GrpcClient("127.0.0.1", 9528);
         try {
             client.queryDepthPriceRaw();
