@@ -35,6 +35,7 @@ public class Listener {
         ObjectMapper mapper = new ObjectMapper();
         try {
             TradeHistoryRaw tradeHistoryRaw = mapper.readValue(record.value().toString(), TradeHistoryRaw.class);
+            if(tradeHistoryRaw.getSide() == null) tradeHistoryRaw.setSide("null");
             tradeHistoryRawRepository.save(tradeHistoryRaw);
         } catch (IOException e) {
             e.printStackTrace();

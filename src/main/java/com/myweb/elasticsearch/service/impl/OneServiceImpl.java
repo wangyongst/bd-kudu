@@ -114,7 +114,7 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         depthPriceRaws.forEach(e -> {
-            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "-" + e.getSymbol() + "-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
+            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "=" + e.getSymbol() + "=" + parameter.getStartTimestamp() + "=" + parameter.getEndTimestamp());
             ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
@@ -125,12 +125,12 @@ public class OneServiceImpl implements OneService {
 
     @Override
     public boolean transTradeHistoryRaw(Parameter parameter) {
-        List<TradeHistoryRaw> tradeHistoryRaws = tradeHistoryRawRepository.findAllByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(),pageable);
+        List<TradeHistoryRaw> tradeHistoryRaws = tradeHistoryRawRepository.findAllByTimestampBetweenOrderByTimestampAsc(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         tradeHistoryRaws.forEach(e -> {
-            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "-" + e.getSymbol() + "-" + parameter.getStartTimestamp() + "-" + parameter.getEndTimestamp());
-            ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
+            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "=" + e.getSymbol() + "=" + parameter.getStartTimestamp() + "=" + parameter.getEndTimestamp());
+            ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
 
@@ -159,26 +159,6 @@ public class OneServiceImpl implements OneService {
         return this.searchDepthPriceRawBySymbol(parameter, this.searchDepthPriceRawByCounterParty(parameter, this.searchDepthPriceRawByTimstamp(parameter, depthPriceRaws)));
     }
 
-    @Override
-    public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter) {
-        List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
-        List<File> files = ServiceUtils.getFile(tradehistoryrawpath, parameter);
-        files.forEach(e -> {
-            DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), TradeHistoryRaw.class);
-            TradeHistoryRaw tradeHistoryRaw = null;
-            while (dataFileReader.hasNext()) {
-                try {
-                    tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
-                    tradeHistoryRaws.add(tradeHistoryRaw);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            ServiceUtils.closeDataFileReader(dataFileReader);
-        });
-        return tradeHistoryRaws;
-    }
-
     public List<DepthPriceRaw> searchDepthPriceRawByTimstamp(Parameter parameter, List<DepthPriceRaw> depthPriceRaws) {
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<>();
         depthPriceRaws.forEach(e -> {
@@ -193,7 +173,7 @@ public class OneServiceImpl implements OneService {
         if (parameter.getCounterParty() == null || parameter.getCounterParty().size() == 0) return depthPriceRaws;
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<>();
         depthPriceRaws.forEach(e -> {
-            if (parameter.getCounterParty() != null && parameter.getCounterParty().size() > 0 && parameter.getCounterParty().contains(e.getCounterParty())) {
+            if (parameter.getCounterParty().contains(e.getCounterParty())) {
                 depthPriceRawList.add(e);
             }
         });
@@ -211,10 +191,12 @@ public class OneServiceImpl implements OneService {
         return depthPriceRawList;
     }
 
-    public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter, List<TradeHistoryRaw> tradeHistoryRaws) {
+
+    @Override
+    public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter) {
+        List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
         List<File> files = ServiceUtils.getFile(tradehistoryrawpath, parameter);
         files.forEach(e -> {
-
             DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), TradeHistoryRaw.class);
             TradeHistoryRaw tradeHistoryRaw = null;
             while (dataFileReader.hasNext()) {
@@ -227,6 +209,39 @@ public class OneServiceImpl implements OneService {
             }
             ServiceUtils.closeDataFileReader(dataFileReader);
         });
-        return tradeHistoryRaws;
+        return this.searchTradeHistoryRawBySymbol(parameter, this.searchTradeHistoryRawByCounterParty(parameter, this.searchTradeHistoryRawByTimstamp(parameter, tradeHistoryRaws)));
+    }
+
+    public List<TradeHistoryRaw> searchTradeHistoryRawByTimstamp(Parameter parameter, List<TradeHistoryRaw> depthPriceRaws) {
+        List<TradeHistoryRaw> tradeHistoryRawList = new ArrayList<>();
+        depthPriceRaws.forEach(e -> {
+            if (parameter.getStartTimestamp() <= e.getTimestamp() && parameter.getEndTimestamp() >= e.getTimestamp()) {
+                tradeHistoryRawList.add(e);
+            }
+        });
+        return tradeHistoryRawList;
+    }
+
+
+    public List<TradeHistoryRaw> searchTradeHistoryRawByCounterParty(Parameter parameter, List<TradeHistoryRaw> tradeHistoryRaws) {
+        if (parameter.getCounterParty() == null || parameter.getCounterParty().size() == 0) return tradeHistoryRaws;
+        List<TradeHistoryRaw> tradeHistoryRawList = new ArrayList<>();
+        tradeHistoryRaws.forEach(e -> {
+            if (parameter.getCounterParty().contains(e.getCounterParty())) {
+                tradeHistoryRawList.add(e);
+            }
+        });
+        return tradeHistoryRawList;
+    }
+
+    public List<TradeHistoryRaw> searchTradeHistoryRawBySymbol(Parameter parameter, List<TradeHistoryRaw> tradeHistoryRaws) {
+        if (parameter.getSymbol() == null || parameter.getSymbol().size() == 0) return tradeHistoryRaws;
+        List<TradeHistoryRaw> tradeHistoryRawList = new ArrayList<>();
+        tradeHistoryRaws.forEach(e -> {
+            if (parameter.getSymbol().contains(e.getSymbol())) {
+                tradeHistoryRawList.add(e);
+            }
+        });
+        return tradeHistoryRawList;
     }
 }

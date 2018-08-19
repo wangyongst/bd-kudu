@@ -7,6 +7,7 @@ import com.anoyi.rpc.CommonServiceGrpc;
 import com.anoyi.rpc.GrpcService;
 import com.google.protobuf.ByteString;
 import com.myweb.domain.DepthPriceRaw;
+import com.myweb.domain.TradeHistoryRaw;
 import com.myweb.elasticsearch.service.OneService;
 import com.myweb.vo.Parameter;
 import io.grpc.ManagedChannel;
@@ -49,7 +50,7 @@ public class GrpcClient {
     private void queryDepthPriceRaw() throws NoSuchMethodException, CharacterCodingException, UnsupportedEncodingException {
         GrpcRequest grpcRequest = new GrpcRequest();
         grpcRequest.setClazz(OneService.class);
-        grpcRequest.setMethod(OneService.class.getMethod("queryDepthPriceRaw", Parameter.class));
+        grpcRequest.setMethod(OneService.class.getMethod("queryTradeHistoryRaw", Parameter.class));
         Parameter parameter = new Parameter();
         List<String> counterParty = new ArrayList<>();
         counterParty.add("huobi");
@@ -58,15 +59,15 @@ public class GrpcClient {
         symbol.add("EOS-BTC");
         symbol.add("ETH-USDT");
         parameter.setSymbol(symbol);
-        parameter.setStartTimestamp(new Date().getTime()-30000);
-        parameter.setEndTimestamp(new Date().getTime());
+        parameter.setStartTimestamp(new Date().getTime() - 6 * 60 * 60 * 1000 - 60000);
+        parameter.setEndTimestamp(new Date().getTime() - 6 * 60 * 60 * 1000);
         Object[] paramters = {parameter};
         grpcRequest.setArgs(paramters);
         byte[] bytes = ProtobufUtils.serialize(grpcRequest);
         GrpcService.Request request = GrpcService.Request.newBuilder().setRequest(ByteString.copyFrom(bytes)).build();
         GrpcService.Response response = blockingStub.handle(request);
-        GrpcResponse out = ProtobufUtils.deserialize(response.getReponse().toByteArray(),GrpcResponse.class);
-        List<DepthPriceRaw> depthPriceRaws = (ArrayList<DepthPriceRaw>)out.getResult();
+        GrpcResponse out = ProtobufUtils.deserialize(response.getReponse().toByteArray(), GrpcResponse.class);
+        List<TradeHistoryRaw> depthPriceRaws = (ArrayList<TradeHistoryRaw>) out.getResult();
         System.out.println(depthPriceRaws.size());
     }
 }

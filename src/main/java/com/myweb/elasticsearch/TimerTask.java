@@ -19,7 +19,7 @@ public class TimerTask {
     @Scheduled(cron = "0/30 * * * * ?") // 每30秒执行一次
     public void scheduler() {
         Parameter parameter = new Parameter();
-        parameter.setStartTimestamp(new Date().getTime() - 1000 * 60 * 60 * 6 - 30);
+        parameter.setStartTimestamp(new Date().getTime() - 1000 * 60 * 60 * 24);
         parameter.setEndTimestamp(new Date().getTime() - 1000 * 60 * 60 * 6);
         while (!oneService.transDepthPriceRaw(parameter)) ;
         while (!oneService.transTradeHistoryRaw(parameter)) ;
