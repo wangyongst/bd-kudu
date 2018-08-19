@@ -34,7 +34,7 @@ public class GrpcClient {
     }
 
     public static void main(String[] args) throws Exception {
-        GrpcClient client = new GrpcClient("127.0.0.1", 9528);
+        GrpcClient client = new GrpcClient("13.250.35.50", 9528);
 //        GrpcClient client = new GrpcClient("127.0.0.1", 9528);
         try {
             client.queryDepthPriceRaw();
@@ -52,15 +52,15 @@ public class GrpcClient {
         grpcRequest.setClazz(OneService.class);
         grpcRequest.setMethod(OneService.class.getMethod("queryTradeHistoryRaw", Parameter.class));
         Parameter parameter = new Parameter();
-        List<String> counterParty = new ArrayList<>();
-        counterParty.add("huobi");
-        parameter.setCounterParty(counterParty);
+//        List<String> counterParty = new ArrayList<>();
+//        counterParty.add("huobi");
+//        parameter.setCounterParty(counterParty);
         List<String> symbol = new ArrayList<>();
         symbol.add("EOS-BTC");
         symbol.add("ETH-USDT");
         parameter.setSymbol(symbol);
-        parameter.setStartTimestamp(new Date().getTime() - 6 * 60 * 60 * 1000 - 60000);
-        parameter.setEndTimestamp(new Date().getTime() - 6 * 60 * 60 * 1000);
+        parameter.setStartTimestamp(1534570260001L);
+        parameter.setEndTimestamp(1534635060001L);
         Object[] paramters = {parameter};
         grpcRequest.setArgs(paramters);
         byte[] bytes = ProtobufUtils.serialize(grpcRequest);

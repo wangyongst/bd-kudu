@@ -97,11 +97,11 @@ public class ServiceUtils {
             if (file.exists() && file.isDirectory()) {
                 for (File f : file.listFiles()) {
                     String name = f.getName();
-                    if (Long.parseLong(name.split("=")[2]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(name.split("=")[3]) >= (Long) parameter.getStartTimestamp()) {
+                    if (Long.parseLong(name.split(".")[2]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(name.split(".")[3]) >= (Long) parameter.getStartTimestamp()) {
                         files.add(f);
-                    } else if (Long.parseLong(name.split("=")[3]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split("=")[2]) <= (Long) parameter.getEndTimestamp()) {
+                    } else if (Long.parseLong(name.split(".")[3]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split(".")[2]) <= (Long) parameter.getEndTimestamp()) {
                         files.add(f);
-                    } else if (Long.parseLong(name.split("=")[3]) <= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split("=")[2]) >= (Long) parameter.getStartTimestamp()) {
+                    } else if (Long.parseLong(name.split(".")[3]) <= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split(".")[2]) >= (Long) parameter.getStartTimestamp()) {
                         files.add(f);
                     }
                 }
