@@ -114,7 +114,7 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         depthPriceRaws.forEach(e -> {
-            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp());
+            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp()+".avro");
             ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
@@ -129,7 +129,7 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         tradeHistoryRaws.forEach(e -> {
-            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp());
+            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp()+".avro");
             ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
