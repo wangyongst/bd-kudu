@@ -10,6 +10,8 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.reflect.ReflectDatumWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 public class ServiceUtils {
+
+    private static final Logger logger = LogManager.getLogger(ServiceUtils.class);
 
     public static DataFileWriter<? extends Serializable> getDataFileWriter(Class<? extends Serializable> theClass, String fileName) {
         File file = new File(fileName);
@@ -30,9 +34,8 @@ public class ServiceUtils {
                 out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
             } else out = new DataFileWriter<Serializable>(datumWriter).appendTo(file);
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.error("GetDataFileWriter Error");
         }
-//        out.setCodec(CodecFactory.snappyCodec());
         return out;
     }
 
@@ -43,7 +46,7 @@ public class ServiceUtils {
                 dataFileWriter.flush();
                 dataFileWriter.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("CloseWriter Error");
             }
 
         }
@@ -55,7 +58,7 @@ public class ServiceUtils {
                 dataFileWriter.append(theClass.cast(object));
                 dataFileWriter.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("WriteToAvro Error");
             }
         }
     }
@@ -66,7 +69,7 @@ public class ServiceUtils {
         try {
             dataFileReader = new DataFileReader<Serializable>(new File(fileName), userDatumReader);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("GetDataFileReader Error");
         }
         return dataFileReader;
     }
@@ -77,7 +80,7 @@ public class ServiceUtils {
             try {
                 dataFileReader.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("CloseDataFileReader Error");
             }
         }
     }

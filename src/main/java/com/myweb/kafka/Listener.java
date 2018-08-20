@@ -5,13 +5,18 @@ import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
 import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
 import com.myweb.domain.DepthPriceRaw;
 import com.myweb.domain.TradeHistoryRaw;
+import com.myweb.elasticsearch.service.impl.ServiceUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.io.IOException;
 
 public class Listener {
+
+    private static final Logger logger = LogManager.getLogger(Listener.class);
 
     @Autowired
     private DepthPriceRawRepository depthPriceRawRepository;
@@ -26,7 +31,7 @@ public class Listener {
             DepthPriceRaw depthPriceRaw = mapper.readValue(record.value().toString(), DepthPriceRaw.class);
             depthPriceRawRepository.save(depthPriceRaw);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Create depthPriceRaw Error");
         }
     }
 
@@ -38,7 +43,7 @@ public class Listener {
             if(tradeHistoryRaw.getSide() == null) tradeHistoryRaw.setSide("null");
             tradeHistoryRawRepository.save(tradeHistoryRaw);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Create tradeHistoryRaw Error");
         }
     }
 }
