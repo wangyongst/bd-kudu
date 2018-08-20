@@ -28,11 +28,12 @@ public class ServiceUtils {
         File file = new File(fileName);
         Schema schema = ReflectData.get().getSchema(theClass);
         DatumWriter<Serializable> datumWriter = new ReflectDatumWriter<Serializable>((Class<Serializable>) theClass);
-        DataFileWriter<Serializable> out = null;
+        DataFileWriter<Serializable> out = new DataFileWriter<Serializable>(datumWriter);
+        out.setCodec(CodecFactory.snappyCodec());
         try {
             if (!file.exists()) {
-                out = new DataFileWriter<Serializable>(datumWriter).create(schema, file);
-            } else out = new DataFileWriter<Serializable>(datumWriter).appendTo(file);
+                out = out.create(schema, file);
+            } else out = out.appendTo(file);
         } catch (IOException e) {
            logger.error("GetDataFileWriter Error");
         }

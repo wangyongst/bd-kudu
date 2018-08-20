@@ -9,6 +9,8 @@ import com.myweb.elasticsearch.service.OneService;
 import com.myweb.vo.Parameter;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,8 @@ import java.util.List;
 @Service("OneService")
 @SuppressWarnings("All")
 public class OneServiceImpl implements OneService {
+
+    private static final Logger logger = LogManager.getLogger(OneServiceImpl.class);
 
     @Autowired
     private DepthPriceRawRepository depthPriceRawRepository;
@@ -151,7 +155,7 @@ public class OneServiceImpl implements OneService {
                     depthPriceRaw = dataFileReader.next(depthPriceRaw);
                     depthPriceRaws.add(depthPriceRaw);
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    logger.error("SearchDepthPriceRaw Error");
                 }
             }
             ServiceUtils.closeDataFileReader(dataFileReader);
@@ -204,7 +208,7 @@ public class OneServiceImpl implements OneService {
                     tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
                     tradeHistoryRaws.add(tradeHistoryRaw);
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    logger.error("SearchTradeHistoryRaw Error");
                 }
             }
             ServiceUtils.closeDataFileReader(dataFileReader);
