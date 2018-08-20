@@ -11,6 +11,8 @@ import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -118,7 +120,7 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         depthPriceRaws.forEach(e -> {
-            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp()+".avro");
+            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
             ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
@@ -133,7 +135,7 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         tradeHistoryRaws.forEach(e -> {
-            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp()+".avro");
+            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
             ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
             ServiceUtils.closeWriter(dataFileWriter);
         });
@@ -247,5 +249,35 @@ public class OneServiceImpl implements OneService {
             }
         });
         return tradeHistoryRawList;
+    }
+
+
+    public List<DepthPriceRaw> queryDepthPriceRaw2(Parameter parameter) {
+        List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRaws;
+        QueryBuilder timestampQueryBuilder = QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp());
+        QueryBuilder counterPartyQueryBuilder = QueryBuilders.boolQuery().should();
+        QueryBuilder symbolQueryBuilder = null;
+
+        depthPriceRawRepository.search(qb1);
+        List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
+        depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
+        depthPriceRawList.addAll(depthPriceRaws);
+        if (parameter.getOrder() != null && parameter.getOrder().equals("asc")) {
+            Collections.sort(depthPriceRawList, new Comparator<DepthPriceRaw>() {
+                @Override
+                public int compare(DepthPriceRaw d1, DepthPriceRaw d2) {
+                    return d1.getTimestamp().compareTo(d2.getTimestamp());
+                }
+            });
+        } else if (parameter.getOrder() != null && parameter.getOrder().equals("desc")) {
+            Collections.sort(depthPriceRawList, new Comparator<DepthPriceRaw>() {
+                @Override
+                public int compare(DepthPriceRaw d1, DepthPriceRaw d2) {
+                    return d2.getTimestamp().compareTo(d1.getTimestamp());
+                }
+            });
+        }
+        return depthPriceRawList;
     }
 }
