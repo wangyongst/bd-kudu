@@ -259,7 +259,7 @@ public class OneServiceImpl implements OneService {
         QueryBuilder counterPartyQueryBuilder = QueryBuilders.boolQuery().should();
         QueryBuilder symbolQueryBuilder = null;
 
-        depthPriceRawRepository.search(qb1);
+        depthPriceRawRepository.search(timestampQueryBuilder);
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
         depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
         depthPriceRawList.addAll(depthPriceRaws);
