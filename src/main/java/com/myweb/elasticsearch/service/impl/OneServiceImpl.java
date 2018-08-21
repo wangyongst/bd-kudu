@@ -11,7 +11,7 @@ import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,8 +46,8 @@ public class OneServiceImpl implements OneService {
 
     private Pageable pageable = PageRequest.of(0, 10000);
 
-    @Override
-    public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
+    //    @Override
+    public List<DepthPriceRaw> queryDepthPriceRaw2(Parameter parameter) {
         List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRaws;
         if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
@@ -252,14 +252,21 @@ public class OneServiceImpl implements OneService {
     }
 
 
-    public List<DepthPriceRaw> queryDepthPriceRaw2(Parameter parameter) {
-        List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
-        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRaws;
-        QueryBuilder timestampQueryBuilder = QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp());
-        QueryBuilder counterPartyQueryBuilder = QueryBuilders.boolQuery().should();
-        QueryBuilder symbolQueryBuilder = null;
-
-        depthPriceRawRepository.search(timestampQueryBuilder);
+    public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
+        final BoolQueryBuilder[] queryBuilders = {QueryBuilders.boolQuery()};
+        queryBuilders[0] = queryBuilders[0].must(QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp()));
+        final BoolQueryBuilder[] countPartyBuilder = {QueryBuilders.boolQuery()};
+        parameter.getCounterParty().forEach(e -> {
+            countPartyBuilder[0] = countPartyBuilder[0].should(QueryBuilders.termQuery("counterParty", e));
+        });
+        final BoolQueryBuilder[] symbolBuilder = {QueryBuilders.boolQuery()};
+        parameter.getCounterParty().forEach(e -> {
+            symbolBuilder[0] = symbolBuilder[0].should(QueryBuilders.termQuery("symbol", e));
+        });
+        if (countPartyBuilder.length > 0) queryBuilders[0] = queryBuilders[0].must(countPartyBuilder[0]);
+        if (symbolBuilder.length > 0) queryBuilders[0] = queryBuilders[0].must(symbolBuilder[0]);
+        List<DepthPriceRaw> depthPriceRaws = (List<DepthPriceRaw>) (depthPriceRawRepository.search(queryBuilders[0]));
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
         depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
         depthPriceRawList.addAll(depthPriceRaws);
