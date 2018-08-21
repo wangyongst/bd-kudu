@@ -46,22 +46,12 @@ public class OneServiceImpl implements OneService {
 
     private Pageable pageable = PageRequest.of(0, 10000);
 
-    //    @Override
-    public List<DepthPriceRaw> queryDepthPriceRaw2(Parameter parameter) {
-        List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
-        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRaws;
-        if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
-            depthPriceRaws = depthPriceRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() == null && parameter.getSymbol() != null) {
-            depthPriceRaws = depthPriceRawRepository.findAllBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() != null && parameter.getSymbol() == null) {
-            depthPriceRaws = depthPriceRawRepository.findAllByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() != null && parameter.getSymbol() != null) {
-            depthPriceRaws = depthPriceRawRepository.findAllByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        }
+    @Override
+    public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
         List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return depthPriceRawList;
         depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
-        depthPriceRawList.addAll(depthPriceRaws);
+        depthPriceRawList.addAll(depthPriceRawRepository.search(makeQuery(parameter), pageable).getContent());
         if (parameter.getOrder() != null && parameter.getOrder().equals("asc")) {
             Collections.sort(depthPriceRawList, new Comparator<DepthPriceRaw>() {
                 @Override
@@ -82,20 +72,10 @@ public class OneServiceImpl implements OneService {
 
     @Override
     public List<TradeHistoryRaw> queryTradeHistoryRaw(Parameter parameter) {
-        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
-        List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
-        if (parameter.getCounterParty() == null && parameter.getSymbol() == null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findAllByTimestampBetween(parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() == null && parameter.getSymbol() != null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findAllBySymbolInAndTimestampBetween(parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() != null && parameter.getSymbol() == null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findAllByCounterPartyInAndTimestampBetween(parameter.getCounterParty(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        } else if (parameter.getCounterParty() != null && parameter.getSymbol() != null) {
-            tradeHistoryRaws = tradeHistoryRawRepository.findAllByCounterPartyInAndSymbolInAndTimestampBetween(parameter.getCounterParty(), parameter.getSymbol(), parameter.getStartTimestamp().longValue(), parameter.getEndTimestamp().longValue(), pageable);
-        }
         List<TradeHistoryRaw> tradeHistoryRawList = new ArrayList<TradeHistoryRaw>();
+        if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return tradeHistoryRawList;
         tradeHistoryRawList.addAll(searchTradeHistoryRaw(parameter));
-        tradeHistoryRawList.addAll(tradeHistoryRaws);
+        tradeHistoryRawList.addAll(tradeHistoryRawRepository.search(makeQuery(parameter), pageable).getContent());
         if (parameter.getOrder() != null && parameter.getOrder().equals("asc")) {
             Collections.sort(tradeHistoryRawList, new Comparator<TradeHistoryRaw>() {
                 @Override
@@ -252,10 +232,10 @@ public class OneServiceImpl implements OneService {
     }
 
 
-    public List<DepthPriceRaw> queryDepthPriceRaw(Parameter parameter) {
+    public BoolQueryBuilder makeQuery(Parameter parameter) {
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
-        final BoolQueryBuilder[] queryBuilders = {QueryBuilders.boolQuery()};
-        queryBuilders[0] = queryBuilders[0].must(QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp()));
+        BoolQueryBuilder queryBuilders = QueryBuilders.boolQuery();
+        queryBuilders = queryBuilders.must(QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp()));
         final BoolQueryBuilder[] countPartyBuilder = {QueryBuilders.boolQuery()};
         parameter.getCounterParty().forEach(e -> {
             countPartyBuilder[0] = countPartyBuilder[0].should(QueryBuilders.termQuery("counterParty", e));
@@ -264,27 +244,8 @@ public class OneServiceImpl implements OneService {
         parameter.getCounterParty().forEach(e -> {
             symbolBuilder[0] = symbolBuilder[0].should(QueryBuilders.termQuery("symbol", e));
         });
-        if (countPartyBuilder.length > 0) queryBuilders[0] = queryBuilders[0].must(countPartyBuilder[0]);
-        if (symbolBuilder.length > 0) queryBuilders[0] = queryBuilders[0].must(symbolBuilder[0]);
-        List<DepthPriceRaw> depthPriceRaws = (List<DepthPriceRaw>) (depthPriceRawRepository.search(queryBuilders[0]));
-        List<DepthPriceRaw> depthPriceRawList = new ArrayList<DepthPriceRaw>();
-        depthPriceRawList.addAll(searchDepthPriceRaw(parameter));
-        depthPriceRawList.addAll(depthPriceRaws);
-        if (parameter.getOrder() != null && parameter.getOrder().equals("asc")) {
-            Collections.sort(depthPriceRawList, new Comparator<DepthPriceRaw>() {
-                @Override
-                public int compare(DepthPriceRaw d1, DepthPriceRaw d2) {
-                    return d1.getTimestamp().compareTo(d2.getTimestamp());
-                }
-            });
-        } else if (parameter.getOrder() != null && parameter.getOrder().equals("desc")) {
-            Collections.sort(depthPriceRawList, new Comparator<DepthPriceRaw>() {
-                @Override
-                public int compare(DepthPriceRaw d1, DepthPriceRaw d2) {
-                    return d2.getTimestamp().compareTo(d1.getTimestamp());
-                }
-            });
-        }
-        return depthPriceRawList;
+        if (countPartyBuilder.length > 0) queryBuilders = queryBuilders.must(countPartyBuilder[0]);
+        if (symbolBuilder.length > 0) queryBuilders = queryBuilders.must(symbolBuilder[0]);
+        return queryBuilders;
     }
 }
