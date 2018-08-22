@@ -237,16 +237,6 @@ public class OneServiceImpl implements OneService {
         queryBuilders = queryBuilders.must(QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp()));
         if(parameter.getCounterParty() != null && parameter.getCounterParty().size()>0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("counterParty",parameter.getCounterParty())));
         if(parameter.getSymbol() != null && parameter.getSymbol().size()>0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("symbol",parameter.getSymbol())));
-//        final BoolQueryBuilder[] countPartyBuilder = {QueryBuilders.boolQuery()};
-//        parameter.getCounterParty().forEach(e -> {
-//            countPartyBuilder[0] = countPartyBuilder[0].should(QueryBuilders.termQuery("counterParty", e));
-//        });
-//        final BoolQueryBuilder[] symbolBuilder = {QueryBuilders.boolQuery()};
-//        parameter.getCounterParty().forEach(e -> {
-//            symbolBuilder[0] = symbolBuilder[0].should(QueryBuilders.termQuery("symbol", e));
-//        });
-//        if (countPartyBuilder.length > 0) queryBuilders = queryBuilders.must(countPartyBuilder[0]);
-//        if (symbolBuilder.length > 0) queryBuilders = queryBuilders.must(symbolBuilder[0]);
         return queryBuilders;
     }
 }

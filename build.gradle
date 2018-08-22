@@ -70,4 +70,8 @@ dependencies {
     compile('com.anoyi:spring-boot-starter-grpc:1.5.14.RELEASE')
 
     compile group: 'org.apache.avro', name: 'avro', version: '1.8.2'
+
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.392'
+
 }
