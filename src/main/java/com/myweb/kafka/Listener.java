@@ -5,7 +5,6 @@ import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
 import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
 import com.myweb.domain.DepthPriceRaw;
 import com.myweb.domain.TradeHistoryRaw;
-import com.myweb.elasticsearch.service.impl.ServiceUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

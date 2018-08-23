@@ -1,13 +1,14 @@
 package com.myweb.elasticsearch.service.impl;
 
 
+import com.myweb.avro.AvroUtils;
 import com.myweb.domain.DepthPriceRaw;
 import com.myweb.domain.TradeHistoryRaw;
 import com.myweb.elasticsearch.dao.DepthPriceRawRepository;
 import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
 import com.myweb.elasticsearch.service.OneService;
+import com.myweb.s3.S3Utils;
 import com.myweb.vo.Parameter;
-import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,13 +36,16 @@ public class OneServiceImpl implements OneService {
     private DepthPriceRawRepository depthPriceRawRepository;
 
     @Autowired
+    private S3Utils amazonS3Utils;
+
+    @Autowired
     private TradeHistoryRawRepository tradeHistoryRawRepository;
 
-    @Value("${custom.avro.path.depthpriceraw}")
-    private String depthpricerawpath;
+    @Value("${custom.s3.bucketname.depthpriceraw}")
+    private String depthpricerawbucketname;
 
-    @Value("${custom.avro.path.tradehistoryraw}")
-    private String tradehistoryrawpath;
+    @Value("${custom.s3.bucketname.tradehistoryraw}")
+    private String tradehistoryrawbucketname;
 
     private Pageable pageable = PageRequest.of(0, 10000);
 
@@ -100,9 +103,11 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         depthPriceRaws.forEach(e -> {
-            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) ServiceUtils.getDataFileWriter(DepthPriceRaw.class, ServiceUtils.makePath(depthpricerawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
-            ServiceUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
-            ServiceUtils.closeWriter(dataFileWriter);
+            File file = amazonS3Utils.getFile(depthpricerawbucketname, S3Utils.makePath(parameter), S3Utils.makePath(parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
+            DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) AvroUtils.getDataFileWriter(DepthPriceRaw.class, file);
+            AvroUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
+            AvroUtils.closeWriter(dataFileWriter);
+            S3Utils.deleteTempFile(file);
         });
         //delete
         depthPriceRawRepository.deleteAllByTimestampBetween(0L, parameter.getEndTimestamp());
@@ -115,9 +120,9 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         tradeHistoryRaws.forEach(e -> {
-            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
-            ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
-            ServiceUtils.closeWriter(dataFileWriter);
+//            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
+//            ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
+//            ServiceUtils.closeWriter(dataFileWriter);
         });
 
         //delete
@@ -128,20 +133,20 @@ public class OneServiceImpl implements OneService {
     @Override
     public List<DepthPriceRaw> searchDepthPriceRaw(Parameter parameter) {
         List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
-        List<File> files = ServiceUtils.getFile(depthpricerawpath, parameter);
-        files.forEach(e -> {
-            DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), DepthPriceRaw.class);
-            DepthPriceRaw depthPriceRaw = null;
-            while (dataFileReader != null && dataFileReader.hasNext()) {
-                try {
-                    depthPriceRaw = dataFileReader.next(depthPriceRaw);
-                    depthPriceRaws.add(depthPriceRaw);
-                } catch (IOException e1) {
-                    logger.error("SearchDepthPriceRaw Error");
-                }
-            }
-            ServiceUtils.closeDataFileReader(dataFileReader);
-        });
+//        List<File> files = ServiceUtils.getFile(depthpricerawpath, parameter);
+//        files.forEach(e -> {
+////            DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), DepthPriceRaw.class);
+////            DepthPriceRaw depthPriceRaw = null;
+////            while (dataFileReader != null && dataFileReader.hasNext()) {
+////                try {
+////                    depthPriceRaw = dataFileReader.next(depthPriceRaw);
+////                    depthPriceRaws.add(depthPriceRaw);
+////                } catch (IOException e1) {
+////                    logger.error("SearchDepthPriceRaw Error");
+////                }
+////            }
+////            ServiceUtils.closeDataFileReader(dataFileReader);
+//        });
         return this.searchDepthPriceRawBySymbol(parameter, this.searchDepthPriceRawByCounterParty(parameter, this.searchDepthPriceRawByTimstamp(parameter, depthPriceRaws)));
     }
 
@@ -181,20 +186,20 @@ public class OneServiceImpl implements OneService {
     @Override
     public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter) {
         List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
-        List<File> files = ServiceUtils.getFile(tradehistoryrawpath, parameter);
-        files.forEach(e -> {
-            DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), TradeHistoryRaw.class);
-            TradeHistoryRaw tradeHistoryRaw = null;
-            while (dataFileReader.hasNext()) {
-                try {
-                    tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
-                    tradeHistoryRaws.add(tradeHistoryRaw);
-                } catch (IOException e1) {
-                    logger.error("SearchTradeHistoryRaw Error");
-                }
-            }
-            ServiceUtils.closeDataFileReader(dataFileReader);
-        });
+//        List<File> files = ServiceUtils.getFile(tradehistoryrawpath, parameter);
+//        files.forEach(e -> {
+////            DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), TradeHistoryRaw.class);
+////            TradeHistoryRaw tradeHistoryRaw = null;
+////            while (dataFileReader.hasNext()) {
+////                try {
+////                    tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
+////                    tradeHistoryRaws.add(tradeHistoryRaw);
+////                } catch (IOException e1) {
+////                    logger.error("SearchTradeHistoryRaw Error");
+////                }
+////            }
+////            ServiceUtils.closeDataFileReader(dataFileReader);
+//        });
         return this.searchTradeHistoryRawBySymbol(parameter, this.searchTradeHistoryRawByCounterParty(parameter, this.searchTradeHistoryRawByTimstamp(parameter, tradeHistoryRaws)));
     }
 
@@ -235,8 +240,8 @@ public class OneServiceImpl implements OneService {
         if (parameter.getStartTimestamp() == null || parameter.getEndTimestamp() == null) return null;
         BoolQueryBuilder queryBuilders = QueryBuilders.boolQuery();
         queryBuilders = queryBuilders.must(QueryBuilders.rangeQuery("timestamp").from(parameter.getStartTimestamp()).to(parameter.getEndTimestamp()));
-        if(parameter.getCounterParty() != null && parameter.getCounterParty().size()>0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("counterParty",parameter.getCounterParty())));
-        if(parameter.getSymbol() != null && parameter.getSymbol().size()>0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("symbol",parameter.getSymbol())));
+        if (parameter.getCounterParty() != null && parameter.getCounterParty().size() > 0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("counterParty", parameter.getCounterParty())));
+        if (parameter.getSymbol() != null && parameter.getSymbol().size() > 0) queryBuilders.must(QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("symbol", parameter.getSymbol())));
         return queryBuilders;
     }
 }
