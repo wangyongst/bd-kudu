@@ -1,6 +1,5 @@
 package com.myweb.grpc.demo;
 
-import com.amazonaws.services.s3.internal.ServiceUtils;
 import com.myweb.avro.AvroUtils;
 import com.myweb.domain.DepthPriceRaw;
 import com.myweb.domain.Price;
@@ -9,7 +8,6 @@ import com.myweb.vo.Parameter;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 
-import java.awt.print.Pageable;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -20,6 +18,8 @@ import java.util.List;
 public class Test {
 
     public static void main(String[] args) {
+
+        S3Utils s3Utils = new S3Utils();
         DepthPriceRaw depthPriceRaw = new DepthPriceRaw();
         depthPriceRaw.setSymbol("111");
         depthPriceRaw.setCounterParty("1111");
@@ -34,7 +34,7 @@ public class Test {
 
         Parameter parameter = new Parameter();
         parameter.setEndTimestamp(depthPriceRaw.getTimestamp());
-        File file = S3Utils.makeTempFile(S3Utils.makePath(parameter),S3Utils.makeDepthPriceFileName(parameter,depthPriceRaw));
+        File file = s3Utils.makeTempFile(s3Utils.makePath(parameter), s3Utils.makeDepthPriceFileName(parameter, depthPriceRaw));
         DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) AvroUtils.getDataFileWriter(DepthPriceRaw.class, file);
         AvroUtils.writeToAvro(dataFileWriter, depthPriceRaw, DepthPriceRaw.class);
         AvroUtils.closeWriter(dataFileWriter);
