@@ -26,9 +26,9 @@ import java.util.List;
 @Component
 public class S3Utils {
     @Value("${custom.s3.accesskey}")
-    private String accesskeyid = "AKIAJLUBGQ46EJB26NTA";
+    private String accesskeyid;
     @Value("${custom.s3.secretaccesskey}")
-    private String secretaccesskey = "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";
+    private String secretaccesskey;
 
     private static final Logger logger = LogManager.getLogger(S3Utils.class);
 
