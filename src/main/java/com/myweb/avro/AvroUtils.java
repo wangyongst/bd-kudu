@@ -1,6 +1,5 @@
 package com.myweb.avro;
 
-import com.myweb.vo.Parameter;
 import org.apache.avro.Schema;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileReader;
@@ -16,9 +15,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class AvroUtils {
 
@@ -30,11 +26,11 @@ public class AvroUtils {
         DataFileWriter<Serializable> out = new DataFileWriter<Serializable>(datumWriter);
         out.setCodec(CodecFactory.snappyCodec());
         try {
-
+            if(file.length() == 0) {
                 out = out.create(schema, file);
-
+            }else  out = out.appendTo(file);
         } catch (IOException e) {
-           logger.error("GetDataFileWriter Error");
+            logger.error("GetDataFileWriter Error");
         }
         return out;
     }

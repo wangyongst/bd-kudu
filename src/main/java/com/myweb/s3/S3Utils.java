@@ -64,7 +64,7 @@ public class S3Utils {
     }
 
     public File getFile(String bucketName, String dir, String fileName) {
-        File file = file = makeTempFile(dir, fileName);
+        File file = makeTempFile(dir, fileName);
         if (!listAllFileName(bucketName, dir).contains(fileName)) return file;
         S3ObjectInputStream s3is = s3client.getObject(bucketName, fileName).getObjectContent();
         try {
@@ -103,19 +103,19 @@ public class S3Utils {
         S3Utils.deleteTempFile(file);
     }
 
-    public static String makePath(Parameter parameter) {
+    public String makePath(Parameter parameter) {
         return String.valueOf((int) ((Long) parameter.getEndTimestamp() / (1000 * 60 * 60)));
     }
 
-    public static String makeDepthPriceFileName(Parameter parameter, DepthPriceRaw depthPriceRaw) {
+    public String makeDepthPriceFileName(Parameter parameter, DepthPriceRaw depthPriceRaw) {
         return makePath(parameter) + SUFFIX + depthPriceRaw.getCounterParty() + "." + depthPriceRaw.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro";
     }
 
-    public static String makeTradHistoryFileName(Parameter parameter, TradeHistoryRaw tradeHistoryRaw) {
+    public String makeTradHistoryFileName(Parameter parameter, TradeHistoryRaw tradeHistoryRaw) {
         return makePath(parameter) + SUFFIX + tradeHistoryRaw.getCounterParty() + "." + tradeHistoryRaw.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro";
     }
 
-    public static List<File> getFile(String path, Parameter parameter) {
+    public List<File> getFileList(String bucketName, Parameter parameter) {
         Integer start = (int) ((Long) parameter.getStartTimestamp() / (1000 * 60 * 60));
         if (start <= 426223) start = 426223;
         Integer now = (int) ((Long) new Date().getTime() / (1000 * 60 * 60));
@@ -123,19 +123,16 @@ public class S3Utils {
         if (end >= now) end = now;
         List<File> files = new ArrayList<>();
         for (int i = 0; start + i <= end; i++) {
-            File file = new File(path + File.separator + String.valueOf(start + i));
-            if (file.exists() && file.isDirectory()) {
-                for (File f : file.listFiles()) {
-                    String name = f.getName();
-                    if (Long.parseLong(name.split(".")[2]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(name.split(".")[3]) >= (Long) parameter.getStartTimestamp()) {
-                        files.add(f);
-                    } else if (Long.parseLong(name.split(".")[3]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split(".")[2]) <= (Long) parameter.getEndTimestamp()) {
-                        files.add(f);
-                    } else if (Long.parseLong(name.split(".")[3]) <= (Long) parameter.getEndTimestamp() && Long.parseLong(name.split(".")[2]) >= (Long) parameter.getStartTimestamp()) {
-                        files.add(f);
-                    }
+            String dir = String.valueOf(start + i);
+            listAllFileName(bucketName, String.valueOf(start + i)).forEach(e -> {
+                if (Long.parseLong(e.split(".")[2]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(e.split(".")[3]) >= (Long) parameter.getStartTimestamp()) {
+                    files.add(getFile(bucketName, dir, e));
+                } else if (Long.parseLong(e.split(".")[3]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(e.split(".")[2]) <= (Long) parameter.getEndTimestamp()) {
+                    files.add(getFile(bucketName, dir, e));
+                } else if (Long.parseLong(e.split(".")[3]) <= (Long) parameter.getEndTimestamp() && Long.parseLong(e.split(".")[2]) >= (Long) parameter.getStartTimestamp()) {
+                    files.add(getFile(bucketName, dir, e));
                 }
-            }
+            });
         }
         return files;
     }

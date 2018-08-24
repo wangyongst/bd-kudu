@@ -9,6 +9,7 @@ import com.myweb.elasticsearch.dao.TradeHistoryRawRepository;
 import com.myweb.elasticsearch.service.OneService;
 import com.myweb.s3.S3Utils;
 import com.myweb.vo.Parameter;
+import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +38,7 @@ public class OneServiceImpl implements OneService {
     private DepthPriceRawRepository depthPriceRawRepository;
 
     @Autowired
-    private S3Utils amazonS3Utils;
+    private S3Utils s3Utils;
 
     @Autowired
     private TradeHistoryRawRepository tradeHistoryRawRepository;
@@ -103,10 +105,11 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (depthPriceRaws.size() == 0) return true;
         depthPriceRaws.forEach(e -> {
-            File file = amazonS3Utils.getFile(depthpricerawbucketname, S3Utils.makePath(parameter), S3Utils.makePath(parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
+            File file = s3Utils.getFile(depthpricerawbucketname, s3Utils.makePath(parameter), s3Utils.makeDepthPriceFileName(parameter, e));
             DataFileWriter<DepthPriceRaw> dataFileWriter = (DataFileWriter<DepthPriceRaw>) AvroUtils.getDataFileWriter(DepthPriceRaw.class, file);
             AvroUtils.writeToAvro(dataFileWriter, e, DepthPriceRaw.class);
             AvroUtils.closeWriter(dataFileWriter);
+            s3Utils.putFile(depthpricerawbucketname, s3Utils.makeDepthPriceFileName(parameter, e), file);
             S3Utils.deleteTempFile(file);
         });
         //delete
@@ -120,9 +123,12 @@ public class OneServiceImpl implements OneService {
         //file avro
         if (tradeHistoryRaws.size() == 0) return true;
         tradeHistoryRaws.forEach(e -> {
-//            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) ServiceUtils.getDataFileWriter(TradeHistoryRaw.class, ServiceUtils.makePath(tradehistoryrawpath, parameter) + File.separator + e.getCounterParty() + "." + e.getSymbol() + "." + parameter.getStartTimestamp() + "." + parameter.getEndTimestamp() + ".avro");
-//            ServiceUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
-//            ServiceUtils.closeWriter(dataFileWriter);
+            File file = s3Utils.getFile(tradehistoryrawbucketname, s3Utils.makePath(parameter), s3Utils.makeTradHistoryFileName(parameter, e));
+            DataFileWriter<TradeHistoryRaw> dataFileWriter = (DataFileWriter<TradeHistoryRaw>) AvroUtils.getDataFileWriter(TradeHistoryRaw.class, file);
+            AvroUtils.writeToAvro(dataFileWriter, e, TradeHistoryRaw.class);
+            AvroUtils.closeWriter(dataFileWriter);
+            s3Utils.putFile(tradehistoryrawbucketname, s3Utils.makeTradHistoryFileName(parameter, e), file);
+            S3Utils.deleteTempFile(file);
         });
 
         //delete
@@ -133,20 +139,20 @@ public class OneServiceImpl implements OneService {
     @Override
     public List<DepthPriceRaw> searchDepthPriceRaw(Parameter parameter) {
         List<DepthPriceRaw> depthPriceRaws = new ArrayList<DepthPriceRaw>();
-//        List<File> files = ServiceUtils.getFile(depthpricerawpath, parameter);
-//        files.forEach(e -> {
-////            DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), DepthPriceRaw.class);
-////            DepthPriceRaw depthPriceRaw = null;
-////            while (dataFileReader != null && dataFileReader.hasNext()) {
-////                try {
-////                    depthPriceRaw = dataFileReader.next(depthPriceRaw);
-////                    depthPriceRaws.add(depthPriceRaw);
-////                } catch (IOException e1) {
-////                    logger.error("SearchDepthPriceRaw Error");
-////                }
-////            }
-////            ServiceUtils.closeDataFileReader(dataFileReader);
-//        });
+        List<File> files = s3Utils.getFileList(tradehistoryrawbucketname, parameter);
+        files.forEach(e -> {
+            DataFileReader<DepthPriceRaw> dataFileReader = (DataFileReader<DepthPriceRaw>) AvroUtils.getDataFileReader(e, DepthPriceRaw.class);
+            DepthPriceRaw depthPriceRaw = null;
+            while (dataFileReader != null && dataFileReader.hasNext()) {
+                try {
+                    depthPriceRaw = dataFileReader.next(depthPriceRaw);
+                    depthPriceRaws.add(depthPriceRaw);
+                } catch (IOException e1) {
+                    logger.error("SearchDepthPriceRaw Error");
+                }
+            }
+            AvroUtils.closeDataFileReader(dataFileReader);
+        });
         return this.searchDepthPriceRawBySymbol(parameter, this.searchDepthPriceRawByCounterParty(parameter, this.searchDepthPriceRawByTimstamp(parameter, depthPriceRaws)));
     }
 
@@ -186,20 +192,20 @@ public class OneServiceImpl implements OneService {
     @Override
     public List<TradeHistoryRaw> searchTradeHistoryRaw(Parameter parameter) {
         List<TradeHistoryRaw> tradeHistoryRaws = new ArrayList<TradeHistoryRaw>();
-//        List<File> files = ServiceUtils.getFile(tradehistoryrawpath, parameter);
-//        files.forEach(e -> {
-////            DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) ServiceUtils.getDataFileReader(e.getAbsolutePath(), TradeHistoryRaw.class);
-////            TradeHistoryRaw tradeHistoryRaw = null;
-////            while (dataFileReader.hasNext()) {
-////                try {
-////                    tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
-////                    tradeHistoryRaws.add(tradeHistoryRaw);
-////                } catch (IOException e1) {
-////                    logger.error("SearchTradeHistoryRaw Error");
-////                }
-////            }
-////            ServiceUtils.closeDataFileReader(dataFileReader);
-//        });
+        List<File> files = s3Utils.getFileList(tradehistoryrawbucketname, parameter);
+        files.forEach(e -> {
+            DataFileReader<TradeHistoryRaw> dataFileReader = (DataFileReader<TradeHistoryRaw>) AvroUtils.getDataFileReader(e, TradeHistoryRaw.class);
+            TradeHistoryRaw tradeHistoryRaw = null;
+            while (dataFileReader.hasNext()) {
+                try {
+                    tradeHistoryRaw = dataFileReader.next(tradeHistoryRaw);
+                    tradeHistoryRaws.add(tradeHistoryRaw);
+                } catch (IOException e1) {
+                    logger.error("SearchTradeHistoryRaw Error");
+                }
+            }
+            AvroUtils.closeDataFileReader(dataFileReader);
+        });
         return this.searchTradeHistoryRawBySymbol(parameter, this.searchTradeHistoryRawByCounterParty(parameter, this.searchTradeHistoryRawByTimstamp(parameter, tradeHistoryRaws)));
     }
 
