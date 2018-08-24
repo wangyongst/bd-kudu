@@ -124,7 +124,7 @@ public class S3Utils {
         List<File> files = new ArrayList<>();
         for (int i = 0; start + i <= end; i++) {
             String dir = String.valueOf(start + i);
-            listAllFileName(bucketName, String.valueOf(start + i)).forEach(e -> {
+            listAllFileName(bucketName, dir).forEach(e -> {
                 if (Long.parseLong(e.split(".")[2]) <= (Long) parameter.getStartTimestamp() && Long.parseLong(e.split(".")[3]) >= (Long) parameter.getStartTimestamp()) {
                     files.add(getFile(bucketName, dir, e));
                 } else if (Long.parseLong(e.split(".")[3]) >= (Long) parameter.getEndTimestamp() && Long.parseLong(e.split(".")[2]) <= (Long) parameter.getEndTimestamp()) {
