@@ -62,7 +62,7 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public Listener listener() {
-        return new Listener();
+    public Listener  listener() {
+        return new Listener ();
     }
 }
