@@ -47,6 +47,10 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-log4j2")
 
+    compile("org.springframework.boot:spring-boot-starter-jdbc"){
+        exclude module: "spring-boot-starter-logging"
+    }
+
     compile("org.springframework.boot:spring-boot-devtools")
 
     compile('org.apache.logging.log4j:log4j-api',
@@ -59,5 +63,10 @@ dependencies {
     compile('org.springframework.kafka:spring-kafka')
 
     compile('com.fasterxml.jackson.core:jackson-databind')
+
+    compile group: 'owinfo', name: 'impalajdbc41', version: '1.0.0'
+
+    // https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc
+    compile group: 'org.apache.hive', name: 'hive-jdbc', version: '1.2.1'
 
 }
