@@ -27,12 +27,11 @@ public class OneServiceImpl implements OneService {
     @Override
     public Result query( ) {
         Result result = new Result();
-        String sql = "SELECT * FROM xiuzheng";
+        String sql = "select * from  afc.dp_list_cust limit 100";
         List<Map<String, Object>> maps = impalaJdbcTemplate.queryForList(sql);
         for (Map<String, Object> map : maps) {
             System.out.println(map.toString());
         }
         return result;
     }
-
 }

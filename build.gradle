@@ -69,4 +69,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc
     compile group: 'org.apache.hive', name: 'hive-jdbc', version: '1.2.1'
 
+    // https://mvnrepository.com/artifact/org.apache.kudu/kudu-mapreduce
+    testCompile group: 'org.apache.kudu', name: 'kudu-mapreduce', version: '1.2.0-cdh5.10.0'
+
+
 }
